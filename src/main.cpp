@@ -3,7 +3,6 @@
 #include "Input.h"
 
 void resizeWindow(int width, int height);
-void processInput(unsigned char key, int x, int y);
 void renderScene();
 void update();
 
