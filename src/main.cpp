@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     const int screenWidth{ glutGet(GLUT_SCREEN_WIDTH) };
     const int screenHeight{ glutGet(GLUT_SCREEN_HEIGHT) };
     glutInitWindowSize(screenWidth, screenHeight);
-    glutCreateWindow("Hello world");
+    glutCreateWindow("Volume rendering");
     glutFullScreen();
 
     glutDisplayFunc(renderScene);
