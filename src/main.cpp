@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     glutFullScreen();
 
     // Handle DICOM
-    dicomImage.loadDICOM("../assets/series-000001/image-000182.dcm");
+    dicomImage.loadDICOM("../assets/lung-data/1-083.dcm");
 
     glutDisplayFunc(renderScene);
     glutIdleFunc(update);

@@ -29,8 +29,12 @@ class DicomHandler
                 return;
             }
 
-            dataset->findAndGetSint32(DCM_Rows, m_height);
-            dataset->findAndGetSint32(DCM_Columns, m_width);
+            Uint16 rows = 0, cols = 0;
+            dataset->findAndGetUint16(DCM_Rows, rows);
+            dataset->findAndGetUint16(DCM_Columns, cols);
+
+            m_width = static_cast<int>(cols);
+            m_height = static_cast<int>(rows);
 
             //std::cout << "Loaded DICOM Image - Width: " << width << ", Height: " << height << '\n';
 
@@ -60,6 +64,11 @@ class DicomHandler
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            if (m_imageData.empty()) {
+                std::cerr << "Error: Image data is empty!" << std::endl;
+                return;
+            }
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_width, m_height, 0, GL_RED, GL_UNSIGNED_BYTE, m_imageData.data());
 
