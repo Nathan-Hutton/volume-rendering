@@ -24,11 +24,12 @@ find_package(assimp REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(DCMTK REQUIRED)
 
 # Add executable
 file(GLOB SOURCES "src/*.cpp")
 add_executable(main ${SOURCES})
 
 # Link libraries
-target_link_libraries(main ${ASSIMP_LIBRARIES} GLEW ${OPENGL_LIBRARIES} GLUT::GLUT)
+target_link_libraries(main ${ASSIMP_LIBRARIES} GLEW ${OPENGL_LIBRARIES} GLUT::GLUT ${DCMTK_LIBRARIES})
 include_directories(${ASSIMP_INCLUDE_DIRS})

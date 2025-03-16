@@ -1,6 +1,7 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include "Input.h"
+#include "DicomHandler.h"
 
 void resizeWindow(int width, int height);
 void renderScene();
