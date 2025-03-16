@@ -10,7 +10,7 @@ class DicomHandler
     public:
         DicomHandler() : m_textureID{ 0 }, m_width{ 0 }, m_height{ 0 } {}
 
-        void LoadDICOM(const std::string& filename) {
+        void loadDICOM(const std::string& filename) {
             DcmFileFormat fileformat;
             const OFCondition status{ fileformat.loadFile(filename.c_str()) };
 
@@ -34,8 +34,7 @@ class DicomHandler
 
             //std::cout << "Loaded DICOM Image - Width: " << width << ", Height: " << height << '\n';
 
-            m_imageData = std::vector<uint8_t>( m_width * m_height );
-
+            m_imageData.resize( m_width * m_height );
             for (int i{ 0 }; i < m_width * m_height; ++i) {
                 m_imageData[i] = static_cast<uint8_t>(pixelData[i] / 256); // Convert 16-bit to 8-bit
             }

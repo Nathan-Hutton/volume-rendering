@@ -14,6 +14,7 @@ const std::vector<GLfloat> quadVertices
     -1.0f, 1.0f, 0.0f,  // Top left
     1.0f, 1.0f, 0.0f,   // Top right
 };
+DicomHandler dicomImage;
 
 int main(int argc, char** argv)
 {
@@ -24,6 +25,9 @@ int main(int argc, char** argv)
     glutInitWindowSize(screenWidth, screenHeight);
     glutCreateWindow("Volume rendering");
     glutFullScreen();
+
+    // Handle DICOM
+    dicomImage.loadDICOM("../assets/series-000001/image-000182.dcm");
 
     glutDisplayFunc(renderScene);
     glutIdleFunc(update);
@@ -46,6 +50,20 @@ void renderScene()
 {
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, dicomImage.getTextureID());
+
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
+    glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);
+    glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
+    glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
+    glEnd();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+
     glutSwapBuffers();
 }
 
