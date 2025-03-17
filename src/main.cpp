@@ -1,20 +1,17 @@
-#include <GL/freeglut.h>
 #include <iostream>
 #include "Input.h"
+#include "ShaderHandler.h"
 #include "DicomHandler.h"
+#include "Quad.h"
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
 void resizeWindow(int width, int height);
 void renderScene();
 void update();
 
-const std::vector<GLfloat> quadVertices
-{
-    -1.0f, -1.0f, 0.0f, // Bottom left
-    1.0f, -1.0f, 0.0f,  // Bottom right
-    -1.0f, 1.0f, 0.0f,  // Top left
-    1.0f, 1.0f, 0.0f,   // Top right
-};
 DicomHandler dicomImage;
+Quad quad;
 
 int main(int argc, char** argv)
 {
@@ -26,9 +23,25 @@ int main(int argc, char** argv)
     glutCreateWindow("Volume rendering");
     glutFullScreen();
 
+    const GLenum err{ glewInit() };
+    if (err != GLEW_OK) {
+        std::cerr << "GLEW Init Error: " << glewGetErrorString(err) << std::endl;
+        return -1;
+    }
+    glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+
+    compileShaders();
+
     // Handle DICOM
     dicomImage.loadDICOM("../assets/lung-data/1-092.dcm");
+    quad.init();
+    glUseProgram(quadShader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, dicomImage.getTextureID());
+    glUniform1i(glGetUniformLocation(quadShader, "quadTexture"), 0);
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glutDisplayFunc(renderScene);
     glutIdleFunc(update);
     glutReshapeFunc(resizeWindow);
@@ -48,21 +61,10 @@ void update()
 
 void renderScene()
 {
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, dicomImage.getTextureID());
-
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f, -1.0f);
-    glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, -1.0f);
-    glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
-    glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, 1.0f);
-    glEnd();
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
+    glUseProgram(quadShader);
+    quad.draw();
 
     glutSwapBuffers();
 }

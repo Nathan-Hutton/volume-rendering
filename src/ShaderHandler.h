@@ -2,8 +2,12 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
-GLuint mainShader;
+GLuint quadShader{};
 
 std::string readFile(const std::string& filePath)
 {
@@ -64,7 +68,8 @@ void linkShaders(GLuint& shaderProgram, const std::vector<std::string>& shaderPa
 
 void compileShader(GLuint& shaderProgram, const std::vector<std::string>& shaderPaths)
 {
-    glDeleteProgram(shaderProgram);
+    if (glIsProgram(shaderProgram))
+        glDeleteProgram(shaderProgram);
 
     const GLuint vertexShader{ createShader(shaderPaths[0], GL_VERTEX_SHADER) };
     const GLuint fragmentShader{ createShader(shaderPaths[1], GL_FRAGMENT_SHADER) };
@@ -102,5 +107,5 @@ void compileShader(GLuint& shaderProgram, const std::vector<std::string>& shader
 
 void compileShaders()
 {
-    compileShader(mainShader, std::vector<std::string>{"../shaders/shader.vert", "../shaders/shader.frag"});
+    compileShader(quadShader, std::vector<std::string>{"../shaders/quadShader.vert", "../shaders/quadShader.frag"});
 }
