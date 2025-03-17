@@ -35,6 +35,8 @@ int main(int argc, char** argv)
     // Handle DICOM
     DicomHandler dicomImage{};
     dicomImage.loadDICOM("../assets/lung-data/1-092.dcm");
+    DicomDirectoryHandler dicomDirectory;
+    dicomDirectory.loadDicomDirectory("../assets/lung-data");
     quad.init();
     glUseProgram(quadShader);
     glActiveTexture(GL_TEXTURE0);
