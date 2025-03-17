@@ -10,7 +10,6 @@ void resizeWindow(int width, int height);
 void renderScene();
 void update();
 
-DicomHandler dicomImage;
 Quad quad;
 
 int main(int argc, char** argv)
@@ -34,6 +33,7 @@ int main(int argc, char** argv)
     compileShaders();
 
     // Handle DICOM
+    DicomHandler dicomImage{};
     dicomImage.loadDICOM("../assets/lung-data/1-092.dcm");
     quad.init();
     glUseProgram(quadShader);
