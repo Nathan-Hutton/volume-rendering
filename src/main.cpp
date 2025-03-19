@@ -33,15 +33,15 @@ int main(int argc, char** argv)
     compileShaders();
 
     // Handle DICOM
-    DicomHandler dicomImage{};
-    dicomImage.loadDICOM("../assets/lung-data/1-092.dcm");
-    DicomDirectoryHandler dicomDirectory;
-    dicomDirectory.loadDicomDirectory("../assets/lung-data");
+    DicomHandler dicomHandler;
+    dicomHandler.loadDicomDirectory("../assets/lung-data");
     quad.init();
-    glUseProgram(quadShader);
+
+    glUseProgram(volumeShader);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, dicomImage.getTextureID());
-    glUniform1i(glGetUniformLocation(quadShader, "quadTexture"), 0);
+    glBindTexture(GL_TEXTURE_3D, dicomHandler.getTextureID());
+    glUniform1i(glGetUniformLocation(volumeShader, "volumeTexture"), 0);
+    glUniform1f(glGetUniformLocation(volumeShader, "sliceIndex"), 92);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glutDisplayFunc(renderScene);
@@ -65,7 +65,7 @@ void renderScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(quadShader);
+    glUseProgram(volumeShader);
     quad.draw();
 
     glutSwapBuffers();

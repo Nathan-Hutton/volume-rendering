@@ -7,7 +7,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
-GLuint quadShader{};
+GLuint volumeShader{};
 
 std::string readFile(const std::string& filePath)
 {
@@ -107,5 +107,5 @@ void compileShader(GLuint& shaderProgram, const std::vector<std::string>& shader
 
 void compileShaders()
 {
-    compileShader(quadShader, std::vector<std::string>{"../shaders/quadShader.vert", "../shaders/quadShader.frag"});
+    compileShader(volumeShader, std::vector<std::string>{"../shaders/volumeShader.vert", "../shaders/volumeShader.frag"});
 }
