@@ -8,6 +8,7 @@
 #include <GL/freeglut.h>
 
 GLuint volumeShader{};
+GLuint rayCastingShader{};
 
 std::string readFile(const std::string& filePath)
 {
@@ -108,4 +109,5 @@ void compileShader(GLuint& shaderProgram, const std::vector<std::string>& shader
 void compileShaders()
 {
     compileShader(volumeShader, std::vector<std::string>{"../shaders/volumeShader.vert", "../shaders/volumeShader.frag"});
+    compileShader(rayCastingShader, std::vector<std::string>{"../shaders/volumeShaderRayCasting.vert", "../shaders/volumeShaderRayCasting.frag"});
 }

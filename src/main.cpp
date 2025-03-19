@@ -2,15 +2,21 @@
 #include "Input.h"
 #include "ShaderHandler.h"
 #include "DicomHandler.h"
+#include "Cube.h"
 #include "Quad.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/orthonormalize.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void resizeWindow(int width, int height);
 void renderScene();
 void update();
 
-Quad quad;
+//Quad quad;
+Cube cube;
 
 int main(int argc, char** argv)
 {
@@ -29,13 +35,16 @@ int main(int argc, char** argv)
     }
     glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     compileShaders();
 
     // Handle DICOM
     DicomHandler dicomHandler;
     dicomHandler.loadDicomDirectory("../assets/lung-data");
-    quad.init();
+    //quad.init();
+    cube.init();
 
     glUseProgram(volumeShader);
     glActiveTexture(GL_TEXTURE0);
@@ -65,8 +74,14 @@ void renderScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(volumeShader);
-    quad.draw();
+    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
+
+    //glUseProgram(volumeShader);
+    glUseProgram(rayCastingShader);
+    glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
+    glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
+    //quad.draw();
+    cube.draw();
 
     glutSwapBuffers();
 }
