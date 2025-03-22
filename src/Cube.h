@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <array>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 
@@ -11,7 +11,7 @@ class Cube
 
         void init()
         {
-            const std::vector<GLfloat> cubeVertices
+            const std::array<GLfloat, 48> cubeVertices
             {
                 -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
                  1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
@@ -23,7 +23,7 @@ class Cube
                  1.0f,  1.0f, 1.0f, 1.0f, 1.0f, 1.0f
             };
 
-            const std::vector<GLuint> cubeIndices = {
+            const std::array<GLuint, 36> cubeIndices = {
                 0, 1, 2, 2, 1, 3,
                 4, 5, 6, 6, 5, 7,
                 0, 4, 2, 2, 4, 6,
