@@ -4,6 +4,7 @@
 #include "DicomHandler.h"
 #include "Cube.h"
 #include "Quad.h"
+#include "TransferFunction.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <glm/glm.hpp>
@@ -46,13 +47,22 @@ int main(int argc, char** argv)
     //quad.init();
     cube.init();
 
-    glUseProgram(volumeShader);
-    glActiveTexture(GL_TEXTURE0);
+    glUseProgram(rayCastingShader);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, dicomHandler.getTextureID());
-    glUniform1i(glGetUniformLocation(volumeShader, "volumeTexture"), 0);
-    glUniform1f(glGetUniformLocation(volumeShader, "sliceIndex"), 92);
+    glUniform1i(glGetUniformLocation(rayCastingShader, "volumeTexture"), 1);
+    glUniform1f(glGetUniformLocation(rayCastingShader, "sliceIndex"), 92);
+
+    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
+    const GLuint transferFunction{ makeGrayscaleTransferFunction() };
+    glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
+    glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_1D, transferFunction);
+    glUniform1i(glGetUniformLocation(rayCastingShader, "transferFunction"), 0);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
     glutDisplayFunc(renderScene);
     glutIdleFunc(update);
     glutReshapeFunc(resizeWindow);
@@ -74,12 +84,8 @@ void renderScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
-
     //glUseProgram(volumeShader);
     glUseProgram(rayCastingShader);
-    glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
-    glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
     //quad.draw();
     cube.draw();
 

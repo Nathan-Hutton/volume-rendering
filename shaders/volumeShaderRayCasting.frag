@@ -16,28 +16,34 @@ in vec3 texCoord;
 uniform sampler3D volumeTexture;
 uniform vec3 rayDirection;
 uniform float sampleRate;
+uniform sampler1D transferFunction;
 
 void main()
 {
     vec3 rayPos = texCoord;
 
     float densitySum = 0.0f;
-    //float alphaSum = 0.0f;
+    float alphaSum = 0.0f;
 
+    vec4 colorSum = vec4(0.0f);
     const int numSamples = 100;
     for (int i = 0; i < numSamples; ++i)
     {
         float sampleDensity = texture(volumeTexture, rayPos).r;
-        densitySum += sampleDensity * (1.0f / numSamples);
-        //alphaSum += sampleDensity * 0.01f;
+        vec4 rgba = texture(transferFunction, sampleDensity);
+        rgba.rgb *= rgba.a;
+
+        colorSum += (1.0f - alphaSum) * rgba;
+        alphaSum += (1.0f - alphaSum) * rgba.a; // This makes sure that the sample contributes proportional to how much light is obscured
+
+        if (alphaSum > 0.96)
+            break;
 
         rayPos += rayDirection * sampleRate;
-
         if (rayPos.x < 0.0f || rayPos.x > 1.0f || rayPos.y < 0.0f || rayPos.y > 1.0f || rayPos.z < 0.0f || rayPos.z > 1.0f)
             break;
     }
 
-    fragColor = vec4(densitySum, densitySum, densitySum, 1.0f);
-    //fragColor = vec4(densitySum, densitySum, densitySum, alphaSum);
+    fragColor = vec4(vec3(colorSum), 1.0f);
     // Right now, the alpha value actually doens't do anything since I haven't enabled it in OpenGL. I don't know what would happen if I did
 }
