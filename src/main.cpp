@@ -16,7 +16,6 @@ void resizeWindow(int width, int height);
 void renderScene();
 void update();
 
-//Quad quad;
 Cube cube;
 
 int main(int argc, char** argv)
@@ -44,7 +43,6 @@ int main(int argc, char** argv)
     // Handle DICOM
     DicomHandler dicomHandler;
     dicomHandler.loadDicomDirectory("../assets/lung-data");
-    //quad.init();
     cube.init();
 
     glUseProgram(rayCastingShader);
@@ -54,7 +52,8 @@ int main(int argc, char** argv)
     glUniform1f(glGetUniformLocation(rayCastingShader, "sliceIndex"), 92);
 
     constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
-    const GLuint transferFunction{ makeGrayscaleTransferFunction() };
+    //const GLuint transferFunction{ makeGrayscaleTransferFunction() };
+    const GLuint transferFunction{ makeColorTransferFunction() };
     glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
     glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
     glActiveTexture(GL_TEXTURE0);
@@ -75,18 +74,13 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void update()
-{
-    // Put something here
-}
+void update() {}
 
 void renderScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //glUseProgram(volumeShader);
     glUseProgram(rayCastingShader);
-    //quad.draw();
     cube.draw();
 
     glutSwapBuffers();

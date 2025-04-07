@@ -33,8 +33,9 @@ void main()
         vec4 rgba = texture(transferFunction, sampleDensity);
         rgba.rgb *= rgba.a;
 
+        // This makes sure that the sample contributes proportional to how much light is obscured
         colorSum += (1.0f - alphaSum) * rgba;
-        alphaSum += (1.0f - alphaSum) * rgba.a; // This makes sure that the sample contributes proportional to how much light is obscured
+        alphaSum += (1.0f - alphaSum) * rgba.a;
 
         if (alphaSum > 0.96)
             break;
@@ -44,6 +45,6 @@ void main()
             break;
     }
 
-    fragColor = vec4(vec3(colorSum), 1.0f);
-    // Right now, the alpha value actually doens't do anything since I haven't enabled it in OpenGL. I don't know what would happen if I did
+    fragColor = vec4(vec3(colorSum), alphaSum);
+    // Right now, the alpha value actually doenst do anything since I havent enabled it in OpenGL. I don't know what would happen if I did
 }
