@@ -68,8 +68,6 @@ int main(int argc, char** argv)
     glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 2);
 
     // Setup other uniform variables
-    //constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
-    //glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
     glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
     glUniform2f(glGetUniformLocation(rayCastingShader, "viewportSize"), glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 
@@ -90,7 +88,9 @@ void update()
 void renderScene()
 {
     // Record exit points of the cube
-    glCullFace(GL_BACK);
+    //glDisable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glFrontFace(GL_CW);
     exitPointsBuffer.bindForWriting();
     glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -101,6 +101,7 @@ void renderScene()
 
     // Render to the main buffer
     glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

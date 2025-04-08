@@ -22,20 +22,33 @@ uniform vec2 viewportSize;
 void main()
 {
     const vec3 entry = texCoord;
-    const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
-    //const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
+    const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
+    //const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
+
+    fragColor = vec4(exit, 1.0f);
+    return;
+
+    //if (entry == exit)
+    //{   
+        //fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        //return;
+    //}
+
     const vec3 rayDir = normalize(exit - entry);
     float rayLength = length(exit - entry);
     vec3 rayPos = entry;
 
-    float t = 0.0f;
+    //float t = 0.0f;
 
     float densitySum = 0.0f;
     float alphaSum = 0.0f;
 
     vec4 colorSum = vec4(0.0f);
-    //const int numSamples = 100;
-    while (t < rayLength)
+
+    const int numSteps = int(rayLength / sampleRate);
+    vec3 rayStep = rayDir * sampleRate;
+    //while (t < rayLength)
+    for (int i = 0; i < numSteps; ++i)
     {
         float density = texture(volumeTexture, rayPos).r;
         vec4 rgba = texture(transferFunction, density);
@@ -48,10 +61,10 @@ void main()
         if (alphaSum > 0.96)
             break;
 
-        t += sampleRate;
-        rayPos = entry + rayDir * t;
+        //t += sampleRate;
+        rayPos += rayStep;
     }
 
     fragColor = vec4(vec3(colorSum), alphaSum);
-    // Right now, the alpha value actually doenst do anything since I havent enabled it in OpenGL. I don't know what would happen if I did
+    //Right now, the alpha value actually doenst do anything since I havent enabled it in OpenGL. I don't know what would happen if I did
 }
