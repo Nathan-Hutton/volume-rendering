@@ -24,9 +24,7 @@ int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    const int screenWidth{ glutGet(GLUT_SCREEN_WIDTH) };
-    const int screenHeight{ glutGet(GLUT_SCREEN_HEIGHT) };
-    glutInitWindowSize(screenWidth, screenHeight);
+    glutInitWindowSize(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
     glutCreateWindow("Volume rendering");
     glutFullScreen();
 
@@ -38,6 +36,13 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
+    glutDisplayFunc(renderScene);
+    glutIdleFunc(update);
+    glutReshapeFunc(resizeWindow);
+    glutKeyboardFunc(processInput);
 
     compileShaders();
 
@@ -45,34 +50,29 @@ int main(int argc, char** argv)
     DicomHandler dicomHandler;
     dicomHandler.loadDicomDirectory("../assets/lung-data");
     cube.init();
-    exitPointsBuffer.init();
 
+    // Setup all textures
     glUseProgram(rayCastingShader);
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, dicomHandler.getTextureID());
-    glUniform1i(glGetUniformLocation(rayCastingShader, "volumeTexture"), 1);
-    glUniform1f(glGetUniformLocation(rayCastingShader, "sliceIndex"), 92);
-
-    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
-    //const GLuint transferFunction{ makeGrayscaleTransferFunction() };
+    glUniform1i(glGetUniformLocation(rayCastingShader, "volumeTexture"), 0);
+    
     const GLuint transferFunction{ makeColorTransferFunction() };
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_1D, transferFunction);
+    glUniform1i(glGetUniformLocation(rayCastingShader, "transferFunction"), 1);
+
+    exitPointsBuffer.init();
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, exitPointsBuffer.getTextureID());
+    glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 2);
+
+    // Setup other uniform variables
+    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
     glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
     glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_1D, transferFunction);
-    glUniform1i(glGetUniformLocation(rayCastingShader, "transferFunction"), 0);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    glutDisplayFunc(renderScene);
-    glutIdleFunc(update);
-    glutReshapeFunc(resizeWindow);
-    glutKeyboardFunc(processInput);
-
-    glViewport(0, 0, screenWidth, screenHeight);
 
     glutMainLoop();
-
     return 0;
 }
 
@@ -105,6 +105,7 @@ void renderScene()
 
     glUseProgram(rayCastingShader);
     glUniformMatrix4fv(glGetUniformLocation(rayCastingShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 0);
     cube.draw();
 
     glutSwapBuffers();

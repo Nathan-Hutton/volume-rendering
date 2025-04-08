@@ -14,6 +14,7 @@ out vec4 fragColor;
 in vec3 texCoord;
 
 uniform sampler3D volumeTexture;
+uniform sampler2D exitPoints;
 uniform vec3 rayDirection;
 uniform float sampleRate;
 uniform sampler1D transferFunction;
