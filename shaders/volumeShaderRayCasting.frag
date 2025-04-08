@@ -15,23 +15,30 @@ in vec3 texCoord;
 
 uniform sampler3D volumeTexture;
 uniform sampler2D exitPoints;
-uniform vec3 rayDirection;
 uniform float sampleRate;
 uniform sampler1D transferFunction;
+uniform vec2 viewportSize;
 
 void main()
 {
-    vec3 rayPos = texCoord;
+    const vec3 entry = texCoord;
+    const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
+    //const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
+    const vec3 rayDir = normalize(exit - entry);
+    float rayLength = length(exit - entry);
+    vec3 rayPos = entry;
+
+    float t = 0.0f;
 
     float densitySum = 0.0f;
     float alphaSum = 0.0f;
 
     vec4 colorSum = vec4(0.0f);
-    const int numSamples = 100;
-    for (int i = 0; i < numSamples; ++i)
+    //const int numSamples = 100;
+    while (t < rayLength)
     {
-        float sampleDensity = texture(volumeTexture, rayPos).r;
-        vec4 rgba = texture(transferFunction, sampleDensity);
+        float density = texture(volumeTexture, rayPos).r;
+        vec4 rgba = texture(transferFunction, density);
         rgba.rgb *= rgba.a;
 
         // This makes sure that the sample contributes proportional to how much light is obscured
@@ -41,9 +48,8 @@ void main()
         if (alphaSum > 0.96)
             break;
 
-        rayPos += rayDirection * sampleRate;
-        if (rayPos.x < 0.0f || rayPos.x > 1.0f || rayPos.y < 0.0f || rayPos.y > 1.0f || rayPos.z < 0.0f || rayPos.z > 1.0f)
-            break;
+        t += sampleRate;
+        rayPos = entry + rayDir * t;
     }
 
     fragColor = vec4(vec3(colorSum), alphaSum);

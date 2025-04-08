@@ -68,9 +68,10 @@ int main(int argc, char** argv)
     glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 2);
 
     // Setup other uniform variables
-    constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
-    glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
+    //constexpr glm::vec3 rayDir{ 0.0f, 0.0f, -1.0f };
+    //glUniform3fv(glGetUniformLocation(rayCastingShader, "rayDirection"), 1, glm::value_ptr(rayDir));
     glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
+    glUniform2f(glGetUniformLocation(rayCastingShader, "viewportSize"), glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 
     glutMainLoop();
     return 0;
@@ -78,6 +79,7 @@ int main(int argc, char** argv)
 
 void update() 
 {
+    //const glm::mat4 view{ glm::translate(glm::mat4{ 1.0f }, glm::vec3{ 0.0f, 0.0f, -5.0f }) };
     const glm::mat4 view{ 1.0f };
     constexpr glm::mat4 projection{ 1.0f };
     mvp = projection * view; // We just won't do a model transform
@@ -88,7 +90,7 @@ void update()
 void renderScene()
 {
     // Record exit points of the cube
-    glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
     exitPointsBuffer.bindForWriting();
     glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -105,7 +107,6 @@ void renderScene()
 
     glUseProgram(rayCastingShader);
     glUniformMatrix4fv(glGetUniformLocation(rayCastingShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-    glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 0);
     cube.draw();
 
     glutSwapBuffers();
