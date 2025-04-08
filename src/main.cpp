@@ -3,7 +3,7 @@
 #include "ShaderHandler.h"
 #include "DicomHandler.h"
 #include "Cube.h"
-#include "Quad.h"
+#include "ExitPointsBuffer.h"
 #include "TransferFunction.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
@@ -17,6 +17,8 @@ void renderScene();
 void update();
 
 Cube cube;
+ExitPointsBuffer exitPointsBuffer;
+glm::mat4 mvp;
 
 int main(int argc, char** argv)
 {
@@ -36,7 +38,6 @@ int main(int argc, char** argv)
     glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 
     compileShaders();
 
@@ -44,6 +45,7 @@ int main(int argc, char** argv)
     DicomHandler dicomHandler;
     dicomHandler.loadDicomDirectory("../assets/lung-data");
     cube.init();
+    exitPointsBuffer.init();
 
     glUseProgram(rayCastingShader);
     glActiveTexture(GL_TEXTURE1);
@@ -74,13 +76,35 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void update() {}
+void update() 
+{
+    const glm::mat4 view{ 1.0f };
+    constexpr glm::mat4 projection{ 1.0f };
+    mvp = projection * view; // We just won't do a model transform
+
+    glutPostRedisplay();
+}
 
 void renderScene()
 {
+    // Record exit points of the cube
+    glCullFace(GL_FRONT);
+    exitPointsBuffer.bindForWriting();
+    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(exitCoordsShader);
+    glUniformMatrix4fv(glGetUniformLocation(exitCoordsShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+    cube.draw();
+
+    // Render to the main buffer
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(rayCastingShader);
+    glUniformMatrix4fv(glGetUniformLocation(rayCastingShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
     cube.draw();
 
     glutSwapBuffers();

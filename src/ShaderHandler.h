@@ -8,6 +8,7 @@
 #include <GL/freeglut.h>
 
 GLuint rayCastingShader{};
+GLuint exitCoordsShader{};
 
 namespace 
 {
@@ -111,4 +112,5 @@ namespace
 void compileShaders()
 {
     compileShader(rayCastingShader, std::vector<std::string>{"../shaders/volumeShaderRayCasting.vert", "../shaders/volumeShaderRayCasting.frag"});
+    compileShader(exitCoordsShader, std::vector<std::string>{"../shaders/exitCoords.vert", "../shaders/exitCoords.frag"});
 }
