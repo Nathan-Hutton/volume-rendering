@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <GL/freeglut.h>
+#include <cmath>
 
 namespace Input
 {
@@ -61,16 +62,19 @@ namespace Input
     {
         if (rightMouseHeld)
         {
-            cameraDistanceChange = static_cast<float>(lastMouseYForDistance - y);
+            viewDistance += static_cast<float>(lastMouseYForDistance - y) * 0.01f;
+            viewDistance = std::clamp(viewDistance, -10.0f, -1.0f);
             lastMouseYForDistance = y;
         }
 
         if (leftMouseHeld)
         {
-            xCursorPosChangeForRotation = static_cast<float>(lastXCursorPosForRotation - x);
-            yCursorPosChangeForRotation = static_cast<float>(lastYCursorPosForRotation - y);
-            xCameraRotateAmount += xCursorPosChangeForRotation;
-            yCameraRotateAmount += yCursorPosChangeForRotation;
+            xCameraRotateAmount -= static_cast<float>(lastYCursorPosForRotation - y) * 0.1f;
+            yCameraRotateAmount -= static_cast<float>(lastXCursorPosForRotation - x) * 0.1f;
+            xCameraRotateAmount = fmod(xCameraRotateAmount, 360.0f);
+            yCameraRotateAmount = fmod(yCameraRotateAmount, 360.0f);
+            lastXCursorPosForRotation = x;
+            lastYCursorPosForRotation = y;
         }
     }
 }

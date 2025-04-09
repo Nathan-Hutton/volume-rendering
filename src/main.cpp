@@ -81,10 +81,9 @@ void update()
 {
     //const glm::mat4 view{ 1.0f };
     glm::mat4 view{ glm::translate(glm::mat4{ 1.0f }, glm::vec3{ 0.0f, 0.0f, Input::viewDistance }) };
-    view = glm::rotate(view, glm::radians(-Input::xCameraRotateAmount), glm::vec3{1.0f, 0.0f,0.0f});
-    view = glm::rotate(view, glm::radians(-Input::yCameraRotateAmount), glm::vec3{0.0f, 1.0f, 0.0f});
+    view = glm::rotate(view, glm::radians(Input::xCameraRotateAmount), glm::vec3{1.0f, 0.0f,0.0f});
+    view = glm::rotate(view, glm::radians(Input::yCameraRotateAmount), glm::vec3{0.0f, 1.0f, 0.0f});
 
-    //view = glm::rotate(view, glm::radians(90.0f), glm::vec3{ 0.0f, 0.0f, 0.0f });
     const glm::mat4 projection{ glm::perspective(glm::radians(45.0f), static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) / static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT)), 0.1f, 1000.0f) };
     //const float aspect{ static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) / static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT)) };
     //const float orthoHeight{ 2.0f };
