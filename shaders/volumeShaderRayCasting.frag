@@ -25,14 +25,15 @@ void main()
     const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
     //const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
 
-    fragColor = vec4(exit, 1.0f);
+    fragColor = vec4(entry, 1.0f);
+    //fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
     return;
 
-    //if (entry == exit)
-    //{   
-        //fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        //return;
-    //}
+    if (distance(entry, exit) < 0.001)
+    {   
+        fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        return;
+    }
 
     const vec3 rayDir = normalize(exit - entry);
     float rayLength = length(exit - entry);

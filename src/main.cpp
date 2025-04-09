@@ -77,9 +77,9 @@ int main(int argc, char** argv)
 
 void update() 
 {
-    //const glm::mat4 view{ glm::translate(glm::mat4{ 1.0f }, glm::vec3{ 0.0f, 0.0f, -5.0f }) };
-    const glm::mat4 view{ 1.0f };
-    constexpr glm::mat4 projection{ 1.0f };
+    //const glm::mat4 view{ 1.0f };
+    const glm::mat4 view{ glm::translate(glm::mat4{ 1.0f }, glm::vec3{ 0.0f, 0.0f, -5.0f }) };
+    const glm::mat4 projection { glm::perspective(glm::radians(45.0f), static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) / static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT)), 0.1f, 1000.0f) };
     mvp = projection * view; // We just won't do a model transform
 
     glutPostRedisplay();
@@ -89,19 +89,19 @@ void renderScene()
 {
     // Record exit points of the cube
     //glDisable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glFrontFace(GL_CW);
-    exitPointsBuffer.bindForWriting();
-    glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glCullFace(GL_FRONT);
+    //glFrontFace(GL_CW);
+    //exitPointsBuffer.bindForWriting();
+    //glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(exitCoordsShader);
-    glUniformMatrix4fv(glGetUniformLocation(exitCoordsShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-    cube.draw();
+    //glUseProgram(exitCoordsShader);
+    //glUniformMatrix4fv(glGetUniformLocation(exitCoordsShader, "mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
+    //cube.draw();
 
-    // Render to the main buffer
-    glCullFace(GL_BACK);
-    glFrontFace(GL_CCW);
+    //// Render to the main buffer
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
