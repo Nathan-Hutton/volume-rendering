@@ -22,35 +22,27 @@ uniform vec2 viewportSize;
 void main()
 {
     const vec3 entry = texCoord;
-    const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
-    //const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
+    //const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
+    const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
 
-    fragColor = vec4(exit, 1.0f);
+    //fragColor = vec4(exit, 1.0f);
     //fragColor = vec4(entry, 1.0f);
     //fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    return;
-
-    if (distance(entry, exit) < 0.001)
-    {   
-        fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        return;
-    }
+    //return;
 
     const vec3 rayDir = normalize(exit - entry);
     float rayLength = length(exit - entry);
     vec3 rayPos = entry;
 
-    //float t = 0.0f;
+    float t = 0.0f;
 
     float densitySum = 0.0f;
     float alphaSum = 0.0f;
 
     vec4 colorSum = vec4(0.0f);
 
-    const int numSteps = int(rayLength / sampleRate);
     vec3 rayStep = rayDir * sampleRate;
-    //while (t < rayLength)
-    for (int i = 0; i < numSteps; ++i)
+    while (t < rayLength)
     {
         float density = texture(volumeTexture, rayPos).r;
         vec4 rgba = texture(transferFunction, density);
@@ -63,8 +55,8 @@ void main()
         if (alphaSum > 0.96)
             break;
 
-        //t += sampleRate;
-        rayPos += rayStep;
+        t += sampleRate;
+        rayPos = entry + rayDir * t;
     }
 
     fragColor = vec4(vec3(colorSum), alphaSum);
