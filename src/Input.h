@@ -8,14 +8,11 @@ namespace Input
 {
     int lastMouseYForDistance{};
     bool rightMouseHeld{ false };
-    GLfloat cameraDistanceChange{};
     GLfloat viewDistance{ -5.0f };
 
     bool leftMouseHeld{ false };
     int lastXCursorPosForRotation{};
     int lastYCursorPosForRotation{};
-    GLfloat xCursorPosChangeForRotation;
-    GLfloat yCursorPosChangeForRotation;
     GLfloat xCameraRotateAmount;
     GLfloat yCameraRotateAmount;
 
@@ -30,10 +27,7 @@ namespace Input
         if (button == GLUT_RIGHT_BUTTON)
         {
             if (state == GLUT_UP)
-            {
                 rightMouseHeld = false;
-                cameraDistanceChange = 0.0f;
-            }
             else
             {
                 rightMouseHeld = true;
@@ -52,8 +46,6 @@ namespace Input
             else
             {
                 leftMouseHeld = false;
-                xCursorPosChangeForRotation = 0.0f;
-                yCursorPosChangeForRotation = 0.0f;
             }
         }
     }
