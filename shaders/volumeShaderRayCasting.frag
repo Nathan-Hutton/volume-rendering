@@ -25,7 +25,8 @@ void main()
     const vec3 exit = clamp(texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb, 0.0, 1.0);
     //const vec3 exit = texture(exitPoints, gl_FragCoord.xy / viewportSize).rgb;
 
-    fragColor = vec4(entry, 1.0f);
+    fragColor = vec4(exit, 1.0f);
+    //fragColor = vec4(entry, 1.0f);
     //fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f);
     return;
 
