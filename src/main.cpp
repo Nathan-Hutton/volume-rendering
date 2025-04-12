@@ -24,6 +24,8 @@ glm::mat4 mvp;
 int mainWindowID{ 0 };
 int gluiWindowID{ 0 };
 
+TransferFunction transferFunction;
+
 void idleCallback()
 {
     glutSetWindow(mainWindowID);
@@ -37,6 +39,11 @@ void idleCallback()
 void quitApp(int)
 {
     exit(0);
+}
+
+void gluiSpinnerCallback([[maybe_unused]] int controlID)
+{
+    transferFunction.resetData();
 }
 
 int main(int argc, char** argv)
@@ -72,30 +79,35 @@ int main(int argc, char** argv)
     dicomHandler.loadDicomDirectory("../assets/lung-data");
     cube.init();
 
-    float something{ 0.0f };
-    GLUI* glui{ GLUI_Master.create_glui("Controls") };
-    gluiWindowID = glui->get_glut_window_id();
-    GLUI_Spinner* slider{ glui->add_spinner("Opacity 1", GLUI_SPINNER_FLOAT, &something) };
-    slider->set_float_limits(0.0f, 1.0f);
-    glui->add_button("Quit", 0, quitApp);
-    glui->set_main_gfx_window(glutGetWindow());
-    GLUI_Master.set_glutIdleFunc(idleCallback);
-
     // Setup all textures
     glUseProgram(rayCastingShader);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, dicomHandler.getTextureID());
     glUniform1i(glGetUniformLocation(rayCastingShader, "volumeTexture"), 0);
     
-    const GLuint transferFunction{ makeColorTransferFunction() };
+    transferFunction.setAsColorTransferFunction();
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_1D, transferFunction);
+    glBindTexture(GL_TEXTURE_1D, transferFunction.getTextureID());
     glUniform1i(glGetUniformLocation(rayCastingShader, "transferFunction"), 1);
 
     exitPointsBuffer.init();
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, exitPointsBuffer.getTextureID());
     glUniform1i(glGetUniformLocation(rayCastingShader, "exitPoints"), 2);
+
+    // GLUI
+    GLUI* glui{ GLUI_Master.create_glui("Controls") };
+    gluiWindowID = glui->get_glut_window_id();
+    GLUI_Spinner* slider1{ glui->add_spinner("Opacity 1", GLUI_SPINNER_FLOAT, transferFunction.getOpacity1Pointer(), 1, gluiSpinnerCallback) };
+    GLUI_Spinner* slider2{ glui->add_spinner("Opacity 2", GLUI_SPINNER_FLOAT, transferFunction.getOpacity2Pointer(), 1, gluiSpinnerCallback) };
+    GLUI_Spinner* slider3{ glui->add_spinner("Opacity 3", GLUI_SPINNER_FLOAT, transferFunction.getOpacity3Pointer(), 1, gluiSpinnerCallback) };
+    slider1->set_float_limits(0.0f, 1.0f);
+    slider2->set_float_limits(0.0f, 1.0f);
+    slider3->set_float_limits(0.0f, 1.0f);
+    glui->add_button("Quit", 0, quitApp);
+    glui->set_main_gfx_window(glutGetWindow());
+    GLUI_Master.set_glutIdleFunc(idleCallback);
+
 
     // Setup other uniform variables
     glUniform1f(glGetUniformLocation(rayCastingShader, "sampleRate"), 0.01f);
