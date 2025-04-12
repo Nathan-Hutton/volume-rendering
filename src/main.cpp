@@ -11,6 +11,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/orthonormalize.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GL/glui.h>
 
 void resizeWindow(int width, int height);
 void renderScene();
@@ -20,6 +21,24 @@ Cube cube;
 ExitPointsBuffer exitPointsBuffer;
 glm::mat4 mvp;
 
+int mainWindowID{ 0 };
+int gluiWindowID{ 0 };
+
+void idleCallback()
+{
+    glutSetWindow(mainWindowID);
+    glutPopWindow();
+    glutSetWindow(gluiWindowID);
+    glutPopWindow();
+    glutSetWindow(mainWindowID);
+    update();
+}
+
+void quitApp(int)
+{
+    exit(0);
+}
+
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
@@ -27,6 +46,7 @@ int main(int argc, char** argv)
     glutInitWindowSize(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
     glutCreateWindow("Volume rendering");
     glutFullScreen();
+    mainWindowID = glutGetWindow();
 
     const GLenum err{ glewInit() };
     if (err != GLEW_OK) {
@@ -40,7 +60,6 @@ int main(int argc, char** argv)
     glViewport(0, 0, glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 
     glutDisplayFunc(renderScene);
-    glutIdleFunc(update);
     glutReshapeFunc(resizeWindow);
     glutKeyboardFunc(Input::keyboardInputCallback);
     glutMouseFunc(Input::mouseButtonCallback);
@@ -52,6 +71,15 @@ int main(int argc, char** argv)
     DicomHandler dicomHandler;
     dicomHandler.loadDicomDirectory("../assets/lung-data");
     cube.init();
+
+    float something{ 0.0f };
+    GLUI* glui{ GLUI_Master.create_glui("Controls") };
+    gluiWindowID = glui->get_glut_window_id();
+    GLUI_Spinner* slider{ glui->add_spinner("Opacity 1", GLUI_SPINNER_FLOAT, &something) };
+    slider->set_float_limits(0.0f, 1.0f);
+    glui->add_button("Quit", 0, quitApp);
+    glui->set_main_gfx_window(glutGetWindow());
+    GLUI_Master.set_glutIdleFunc(idleCallback);
 
     // Setup all textures
     glUseProgram(rayCastingShader);
@@ -79,16 +107,11 @@ int main(int argc, char** argv)
 
 void update() 
 {
-    //const glm::mat4 view{ 1.0f };
     glm::mat4 view{ glm::translate(glm::mat4{ 1.0f }, glm::vec3{ 0.0f, 0.0f, Input::viewDistance }) };
     view = glm::rotate(view, glm::radians(Input::xCameraRotateAmount), glm::vec3{1.0f, 0.0f,0.0f});
     view = glm::rotate(view, glm::radians(Input::yCameraRotateAmount), glm::vec3{0.0f, 1.0f, 0.0f});
 
     const glm::mat4 projection{ glm::perspective(glm::radians(45.0f), static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) / static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT)), 0.1f, 1000.0f) };
-    //const float aspect{ static_cast<float>(glutGet(GLUT_WINDOW_WIDTH)) / static_cast<float>(glutGet(GLUT_WINDOW_HEIGHT)) };
-    //const float orthoHeight{ 2.0f };
-    //const float orthoWidth{ orthoHeight * aspect };
-    //const glm::mat4 projection{ glm::ortho(-orthoWidth, orthoWidth, -orthoHeight, orthoHeight, 0.1f, 1000.0f) };
     mvp = projection * view; // We just won't do a model transform
 
     glutPostRedisplay();

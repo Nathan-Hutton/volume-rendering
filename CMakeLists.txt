@@ -26,10 +26,11 @@ find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(DCMTK REQUIRED)
 
+find_library(GLUI_LIBRARY glui REQUIRED)
+
 # Add executable
 file(GLOB SOURCES "src/*.cpp")
 add_executable(main ${SOURCES})
 
 # Link libraries
-target_link_libraries(main ${ASSIMP_LIBRARIES} GLEW ${OPENGL_LIBRARIES} GLUT::GLUT ${DCMTK_LIBRARIES})
-include_directories(${ASSIMP_INCLUDE_DIRS})
+target_link_libraries(main GLEW ${OPENGL_LIBRARIES} GLUT::GLUT ${DCMTK_LIBRARIES} ${GLUI_LIBRARY})

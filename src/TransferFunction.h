@@ -48,7 +48,7 @@ GLuint makeColorTransferFunction()
         {
             const float intensity{ density / 0.33f };
             red = static_cast<GLubyte>((density / 0.33f) * 255.0f);
-            alpha = static_cast<GLubyte>(intensity * 0.5f * 255.0f);
+            alpha = static_cast<GLubyte>(intensity * 0.5f * 255.0f * 0.02f);
         }
         else if (density < 0.66f) // Red + green
         {
