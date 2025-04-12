@@ -85,7 +85,8 @@ int main(int argc, char** argv)
     glBindTexture(GL_TEXTURE_3D, dicomHandler.getTextureID());
     glUniform1i(glGetUniformLocation(rayCastingShader, "volumeTexture"), 0);
     
-    transferFunction.setAsColorTransferFunction();
+    //transferFunction.setAsColorTransferFunction();
+    transferFunction.setAsGrayscaleTransferFunction();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_1D, transferFunction.getTextureID());
     glUniform1i(glGetUniformLocation(rayCastingShader, "transferFunction"), 1);
@@ -98,12 +99,16 @@ int main(int argc, char** argv)
     // GLUI
     GLUI* glui{ GLUI_Master.create_glui("Controls") };
     gluiWindowID = glui->get_glut_window_id();
+
     GLUI_Spinner* slider1{ glui->add_spinner("Opacity 1", GLUI_SPINNER_FLOAT, transferFunction.getOpacity1Pointer(), 1, gluiSpinnerCallback) };
     GLUI_Spinner* slider2{ glui->add_spinner("Opacity 2", GLUI_SPINNER_FLOAT, transferFunction.getOpacity2Pointer(), 1, gluiSpinnerCallback) };
     GLUI_Spinner* slider3{ glui->add_spinner("Opacity 3", GLUI_SPINNER_FLOAT, transferFunction.getOpacity3Pointer(), 1, gluiSpinnerCallback) };
     slider1->set_float_limits(0.0f, 1.0f);
     slider2->set_float_limits(0.0f, 1.0f);
     slider3->set_float_limits(0.0f, 1.0f);
+
+    glui->add_checkbox("Color", transferFunction.getUsingColorPointer(), 1, gluiSpinnerCallback);
+
     glui->add_button("Quit", 0, quitApp);
     glui->set_main_gfx_window(glutGetWindow());
     GLUI_Master.set_glutIdleFunc(idleCallback);
