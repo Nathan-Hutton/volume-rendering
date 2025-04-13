@@ -48,6 +48,11 @@ void gluiSpinnerCallback([[maybe_unused]] int controlID)
 
 int main(int argc, char** argv)
 {
+    if (argc < 2)
+    {
+        argv[1] = strdup("../assets/lung-data");
+    }
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
@@ -76,8 +81,7 @@ int main(int argc, char** argv)
 
     // Handle DICOM
     DicomHandler dicomHandler;
-    //dicomHandler.loadDicomDirectory("../assets/lung-data");
-    dicomHandler.loadDicomDirectory("../assets/abdomen");
+    dicomHandler.loadDicomDirectory(argv[1]);
     cube.init();
 
     // Setup all textures
