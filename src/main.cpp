@@ -76,7 +76,8 @@ int main(int argc, char** argv)
 
     // Handle DICOM
     DicomHandler dicomHandler;
-    dicomHandler.loadDicomDirectory("../assets/lung-data");
+    //dicomHandler.loadDicomDirectory("../assets/lung-data");
+    dicomHandler.loadDicomDirectory("../assets/abdomen");
     cube.init();
 
     // Setup all textures

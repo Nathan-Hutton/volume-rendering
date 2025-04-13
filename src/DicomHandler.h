@@ -56,7 +56,13 @@ class DicomHandler
 
                 dataset = fileFormat.getDataset();
                 const Uint16* pixelData{ nullptr };
-                dataset->findAndGetUint16Array(DCM_PixelData, pixelData);
+                status = dataset->findAndGetUint16Array(DCM_PixelData, pixelData);
+
+                if (!status.good() || pixelData == nullptr)
+                {
+                    std::cerr << "Error reading DICOM file: " << dicomFiles[z] << '\n';
+                    return;
+                }
 
                 for (size_t i{ 0 }; i < static_cast<size_t>(m_width * m_height); ++i)
                 {
